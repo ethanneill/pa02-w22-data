@@ -16,11 +16,18 @@
 #include "movies.h"
 using namespace std;
 
-struct movieData{
+struct movieDataAlphabet{
+  string movieName;
+  double movieRating;
+  bool operator<(const movieDataAlphabet& rhs){
+    return movieName < rhs.movieName;
+  }
+};
+
+struct movieDataRating{
   double movieRating;
   string movieName;
-  string movieLine;
-  bool operator<(const movieData& rhs){
+  bool operator<(const movieDataRating& rhs){
     if(movieRating == rhs.movieRating){
       return movieName < rhs.movieName;
     }
@@ -52,46 +59,22 @@ int main(int argc, char** argv){
 
 string line, movieName;
 double movieRating;
-vector<string> vAlphabet;
-vector<movieData> vRating;
+vector<movieDataAlphabet> vAlphabet;
+vector<movieDataRating> vRating;
 // Read each file and store the name and rating
 while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
   // Use std::string movieName and double movieRating
   // to construct your Movie objects
   // cout << movieName << " has rating " << movieRating << endl;
   // insert elements into your data structure
-  string newLineName = line;
-  string newMovieName = movieName;
-  double newMovieRating = movieRating;
-  string newMovieRatingString = line.substr(line.length() - 5, line.length() - 1);
-  
-  if(newMovieRatingString.at(3) == ','){
-    newLineName = newLineName + ".0";
-    newMovieRating = stod(newLineName.substr(movieName.length() + 3, line.length()));
-  }
-  else if(newMovieRatingString.at(2) == ','){
-    newLineName = newLineName.substr(0, newLineName.length() - 2) + "10.0";
-    newMovieRating = stod(newLineName.substr(movieName.length() + 1, line.length()));
-  }
-  else if(newMovieRatingString.at(0) == ','){
-    newLineName = newLineName.substr(0, newLineName.length() - 4) + "10.0";
-    newMovieRating = stod(newLineName.substr(movieName.length() + 1, line.length()));
-  }
-
-  if(line[0] == '"'){
-    newMovieName = movieName.substr(0, movieName.length() + 1);
-    newMovieRating = stod(line.substr(movieName.length() + 3, line.length()));
-    newLineName = newMovieName + "," + to_string(newMovieRating);
-    newLineName = newLineName.substr(0, newLineName.length() - 5);
-  }
 
   if(argc == 2){
-    vAlphabet.push_back(newLineName);
+    struct movieDataAlphabet mda = {movieName, movieRating};
+    vAlphabet.push_back(mda);
   }
-  
   else{
-    struct movieData md = {newMovieRating, newMovieName, newLineName};
-    vRating.push_back(md);
+    struct movieDataRating mdr = {movieRating, movieName};
+    vRating.push_back(mdr);
   }
 }
 
@@ -101,23 +84,18 @@ if(argc == 2){
   //print all the movies in ascending alphabetical order of movie names
   sort(vAlphabet.begin(), vAlphabet.end());
   for(int i = 0; i < vAlphabet.size(); i++){
-    if(vAlphabet[i].at(vAlphabet[i].size() - 4) == '1'){
-      cout<<vAlphabet[i].substr(0, vAlphabet[i].length() - 4)<<" 10.0"<<endl;
-    }
-    else{
-      cout<<vAlphabet[i].substr(0, vAlphabet[i].length() - 4)<<", "<<vAlphabet[i].substr(vAlphabet[i].length() - 3, vAlphabet[i].length())<<endl;
-    }
+    cout<<vAlphabet[i].movieName<<", "<<std::fixed<<std::setprecision(1)<<vAlphabet[i].movieRating<<endl;
   }
   return 0;
 }
 
 if(argc > 2){
   sort(vRating.begin(), vRating.end());
-  vector<movieData> bestMovie;
+  vector<movieDataRating> bestMovie;
   int numOfPrefix = argc - 2;
   int pre = 2;
   while(numOfPrefix != 0){
-    vector<movieData> vMatching;
+    vector<movieDataRating> vMatching;
     for(int i = 0; i < vRating.size(); i++){
       if(argv[pre] == vRating[i].movieName.substr(0, strlen(argv[pre]))){
         vMatching.push_back(vRating[i]);
@@ -125,12 +103,12 @@ if(argc > 2){
     }
     
     if(vMatching.size() == 0){
-      struct movieData nomd = {-1.0, "None"};
+      struct movieDataRating nomd = {-1.0, "None"};
       bestMovie.push_back(nomd);
       cout<<"No movies found with prefix "<<argv[pre]<<endl;
     }
     else{
-      struct movieData matchingmd = {vMatching[0].movieRating, vMatching[0].movieName, vMatching[0].movieLine};
+      struct movieDataRating matchingmd = {vMatching[0].movieRating, vMatching[0].movieName};
       bestMovie.push_back(matchingmd);
       for(int i = 0; i < vMatching.size(); i++){
         cout<<vMatching[i].movieName<<", "<<std::fixed<<std::setprecision(1)<<vMatching[i].movieRating<<endl;
