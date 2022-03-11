@@ -54,20 +54,12 @@ int main(int argc, char** argv){
     cerr << "Could not open file " << argv[1];
     exit(1);
   }
-  
-//Create an object of a STL data-structure to store all the movies
 
 string line, movieName;
 double movieRating;
 vector<movieDataAlphabet> vAlphabet;
 vector<movieDataRating> vRating;
-// Read each file and store the name and rating
 while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
-  // Use std::string movieName and double movieRating
-  // to construct your Movie objects
-  // cout << movieName << " has rating " << movieRating << endl;
-  // insert elements into your data structure
-
   if(argc == 2){
     struct movieDataAlphabet mda = {movieName, movieRating};
     vAlphabet.push_back(mda);
@@ -77,11 +69,9 @@ while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
     vRating.push_back(mdr);
   }
 }
-
 movieFile.close();
 
 if(argc == 2){
-  //print all the movies in ascending alphabetical order of movie names
   sort(vAlphabet.begin(), vAlphabet.end());
   for(int i = 0; i < vAlphabet.size(); i++){
     cout<<vAlphabet[i].movieName<<", "<<std::fixed<<std::setprecision(1)<<vAlphabet[i].movieRating<<endl;
@@ -101,7 +91,6 @@ if(argc > 2){
         vMatching.push_back(vRating[i]);
       }
     }
-    
     if(vMatching.size() == 0){
       struct movieDataRating nomd = {-1.0, "None"};
       bestMovie.push_back(nomd);
@@ -127,12 +116,14 @@ if(argc > 2){
     pre++;
   }
 }
-
-
 return 0;
 }
 
-/* Add your run time analysis for part 3 of the assignment here as commented block*/
+/* 
+Overall time complexity: O((n) + (nlog^2(n)) + (m * n(nlog^2(n))) + (k * nlog^2(n)) + m)
+
+Big-O time complexity: O(m * n(nlog^2(n)))
+*/
 
 
 
