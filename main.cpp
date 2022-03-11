@@ -19,6 +19,7 @@ using namespace std;
 struct movieData{
   double movieRating;
   string movieName;
+  string movieLine;
   bool operator<(const movieData& rhs){
     if(movieRating == rhs.movieRating){
       return movieName < rhs.movieName;
@@ -70,9 +71,9 @@ while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
   }
 
   if(line[0] == '"'){
-    newMovieName = movieName.substr(0, movieName.length());
+    newMovieName = movieName.substr(0, movieName.length() + 1);
     newMovieRating = stod(line.substr(movieName.length() + 3, line.length()));
-    newLineName = newMovieName + to_string(newMovieRating);
+    newLineName = newMovieName + "," + to_string(newMovieRating);
     newLineName = newLineName.substr(0, newLineName.length() - 5);
   }
 
@@ -81,7 +82,7 @@ while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
   }
   
   else{
-    struct movieData md = {newMovieRating, newMovieName};
+    struct movieData md = {newMovieRating, newMovieName, newLineName};
     vRating.push_back(md);
   }
 }
@@ -116,10 +117,10 @@ if(argc > 2){
       cout<<"No movies found with prefix "<<argv[pre]<<endl;
     }
     else{
-      struct movieData matchingmd = {vMatching[0].movieRating, vMatching[0].movieName};
+      struct movieData matchingmd = {vMatching[0].movieRating, vMatching[0].movieName, vMatching[0].movieLine};
       bestMovie.push_back(matchingmd);
       for(int i = 0; i < vMatching.size(); i++){
-        cout<<vMatching[i].movieName<<", "<<vMatching[i].movieRating<<endl;
+        cout<<vMatching[i].movieName<<", "<<vMatching[i].movieLine.substr(vMatching[i].movieLine.length() - 3, vMatching[i].movieLine.length())<<endl;
       }
     }
     cout<<endl;
