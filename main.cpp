@@ -63,11 +63,19 @@ while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
   string newLineName = line;
   string newMovieName = movieName;
   double newMovieRating = movieRating;
-  string newMovieRatingString = line.substr(line.length() - 3, line.length() - 1);
+  string newMovieRatingString = line.substr(line.length() - 5, line.length() - 1);
   
-  if(newMovieRatingString.at(1) == ','){
+  if(newMovieRatingString.at(3) == ','){
     newLineName = newLineName + ".0";
     newMovieRating = stod(newLineName.substr(movieName.length() + 3, line.length()));
+  }
+  else if(newMovieRatingString.at(2) == ','){
+    newLineName = newLineName.substr(0, newLineName.length() - 2) + "10.0";
+    newMovieRating = stod(newLineName.substr(movieName.length() + 1, line.length()));
+  }
+  else if(newMovieRatingString.at(0) == ','){
+    newLineName = newLineName.substr(0, newLineName.length() - 4) + "10.0";
+    newMovieRating = stod(newLineName.substr(movieName.length() + 1, line.length()));
   }
 
   if(line[0] == '"'){
@@ -93,7 +101,12 @@ if(argc == 2){
   //print all the movies in ascending alphabetical order of movie names
   sort(vAlphabet.begin(), vAlphabet.end());
   for(int i = 0; i < vAlphabet.size(); i++){
-    cout<<vAlphabet[i].substr(0, vAlphabet[i].length() - 4)<<", "<<vAlphabet[i].substr(vAlphabet[i].length() - 3, vAlphabet[i].length())<<endl;
+    if(vAlphabet[i].at(vAlphabet[i].size() - 4) == '1'){
+      cout<<vAlphabet[i].substr(0, vAlphabet[i].length() - 4)<<" 10.0"<<endl;
+    }
+    else{
+      cout<<vAlphabet[i].substr(0, vAlphabet[i].length() - 4)<<", "<<vAlphabet[i].substr(vAlphabet[i].length() - 3, vAlphabet[i].length())<<endl;
+    }
   }
   return 0;
 }
@@ -120,7 +133,7 @@ if(argc > 2){
       struct movieData matchingmd = {vMatching[0].movieRating, vMatching[0].movieName, vMatching[0].movieLine};
       bestMovie.push_back(matchingmd);
       for(int i = 0; i < vMatching.size(); i++){
-        cout<<vMatching[i].movieName<<", "<<vMatching[i].movieLine.substr(vMatching[i].movieLine.length() - 3, vMatching[i].movieLine.length())<<endl;
+        cout<<vMatching[i].movieName<<", "<<std::fixed<<std::setprecision(1)<<vMatching[i].movieRating<<endl;
       }
     }
     cout<<endl;
