@@ -12,9 +12,22 @@
 #include <iomanip>
 #include <set>
 #include <queue>
+#include <stack>
+#include "movies.h"
 using namespace std;
 
-
+struct movieData{
+  double movieRating;
+  string movieName;
+  bool operator<(const movieData& rhs){
+    if(movieRating == rhs.movieRating){
+      return movieName < rhs.movieName;
+    }
+    else{
+      return movieRating > rhs.movieRating;
+    }
+  }
+};
 
 bool parseLine(string &line, string &movieName, double &movieRating);
 
@@ -38,31 +51,69 @@ int main(int argc, char** argv){
 
 string line, movieName;
 double movieRating;
+vector<string> vAlphabet;
+vector<movieData> vRating;
 // Read each file and store the name and rating
 while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
   // Use std::string movieName and double movieRating
   // to construct your Movie objects
   // cout << movieName << " has rating " << movieRating << endl;
   // insert elements into your data structure
+  vAlphabet.push_back(line);
+  
+  struct movieData md = {movieRating, movieName};
+  vRating.push_back(md);
 }
 
 movieFile.close();
 
 if(argc == 2){
   //print all the movies in ascending alphabetical order of movie names
+  sort(vAlphabet.begin(), vAlphabet.end());
+  for(int i = 0; i < vAlphabet.size(); i++){
+    cout<<vAlphabet[i].substr(0, vAlphabet[i].length() - 3)<<" "<<vAlphabet[i].substr(vAlphabet[i].length() - 3, vAlphabet[i].length() - 1)<<endl;
+  }
   return 0;
 }
 
-
-//  For each prefix,
-//  Find all movies that have that prefix and store them in an appropriate data structure
-//  If no movie with that prefix exists print the following message
-cout<<"No movies found with prefix "<<"<replace with prefix>"<<endl<<endl;
-
-//  For each prefix,
-//  Print the highest rated movie with that prefix if it exists.
-cout << "Best movie with prefix "<<"<replace with prefix>"<<" is: " << "replace with moview name" <<" with rating " << std::fixed << std::setprecision(1) << "replace with movie rating"<< endl;
+if(argc > 2){
+  sort(vRating.begin(), vRating.end());
+  vector<movieData> bestMovie;
+  int numOfPrefix = argc - 2;
+  int pre = 2;
+  while(numOfPrefix != 0){
+    vector<movieData> vMatching;
+    for(int i = 0; i < vRating.size(); i++){
+      if(argv[pre] == vRating[i].movieName.substr(0, strlen(argv[pre]))){
+        vMatching.push_back(vRating[i]);
+      }
+    }
     
+    if(vMatching.size() == 0){
+      struct movieData nomd = {-1.0, "None"};
+      bestMovie.push_back(nomd);
+      cout<<"No movies found with prefix "<<argv[pre]<<endl;
+    }
+    else{
+      struct movieData matchingmd = {vMatching[0].movieRating, vMatching[0].movieName};
+      bestMovie.push_back(matchingmd);
+      for(int i = 0; i < vMatching.size(); i++){
+        cout<<vMatching[i].movieName<<" "<<vMatching[i].movieRating<<endl;
+      }
+    }
+    cout<<endl;
+    pre++;
+    numOfPrefix--;
+  }
+  numOfPrefix = argc - 2;
+  pre = 2;
+  for(int i = 0; i < numOfPrefix; i++){
+    if((bestMovie[i].movieName != "None") && (bestMovie[i].movieRating != -1.0)){
+      cout<<"Best movie with prefix "<<argv[pre]<<" is: "<<bestMovie[i].movieName<<" with rating "<<bestMovie[i].movieRating<<endl;
+    }
+    pre++;
+  }
+}
 
 
 return 0;
